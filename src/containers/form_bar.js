@@ -1,8 +1,47 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import { addQuestion } from '../actions/index';
 
 
 class AskQuestion extends Component {
 
+    constructor(props){
+        super(props);
+
+        this.state = {
+            question: '',
+            person: '',
+            timestamp: 0
+        };
+
+        this.onFormSubmit = this.onFormSubmit.bind(this);
+        this.onFormChange = this.onFormChange.bind(this);
+    }
+
+    onFormSubmit(event) {
+        event.preventDefault();
+
+        //We need add question, answer item
+        this.setState({timestamp: Date.now()}, () => {
+            this.props.addQuestion(Object.assign({}, this.state));
+            this.setState({
+                question: '',
+                person: '',
+                timestamp: 0
+            })
+        });
+    }
+
+    onFormChange(event) {
+        const { name, value} = event.target;
+
+        event.preventDefault();
+        
+        this.setState({
+            [name]: value
+        });
+    }
 
     render() {
         return (
@@ -16,7 +55,9 @@ class AskQuestion extends Component {
                                 className="form-control"
                                 id="qa"
                                 placeholder="Who invited wheel?"
-                                value=""
+                                value={this.state.question}
+                                name="question"
+                                onChange={this.onFormChange}
                             />
                         </div>
                         <div className="form-group">
@@ -26,12 +67,14 @@ class AskQuestion extends Component {
                                 className="form-control"
                                 id="pa"
                                 placeholder="Maciej Jaskuła"
-                                value=""
+                                value={this.state.person}
+                                name="person"
+                                onChange={this.onFormChange}
                             />
                         </div>
                         <div className="row" >
                             <div className="col-sm-12events text-center">
-                                <button type="button" className="btn btn-default">Submit</button>
+                                <button type="submit" className="btn btn-default">Submit</button>
                             </div>
                         </div>
                     </form>
@@ -41,4 +84,8 @@ class AskQuestion extends Component {
     }
 }
 
-export default AskQuestion;
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({addQuestion}, dispatch);
+}
+
+export default connect(null, mapDispatchToProps)(AskQuestion);
